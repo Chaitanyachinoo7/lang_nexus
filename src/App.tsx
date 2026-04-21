@@ -24,6 +24,10 @@ import {
   Info
 } from 'lucide-react';
 
+import { TemplateLibrary } from './components/TemplateLibrary';
+import { Documentation } from './components/Documentation';
+import { Template } from './templates';
+
 export default function App() {
   const [nodes, setNodes] = useState<Node[]>(INITIAL_NODES);
   const [edges, setEdges] = useState<Edge[]>(INITIAL_EDGES);
@@ -41,6 +45,13 @@ export default function App() {
     setActiveNodeId(id);
     const newTrace = simulateTrace(id, node.config);
     setTraces(prev => [...prev, newTrace]);
+  };
+
+  const handleSelectTemplate = (template: Template) => {
+    setNodes(template.nodes);
+    setEdges(template.edges);
+    setActiveNodeId(null);
+    setTraces([]);
   };
 
   const activeNode = nodes.find(n => n.id === activeNodeId);
@@ -77,6 +88,8 @@ export default function App() {
                   <span className={item.color}>●</span> {item.name}
                 </a>
               ))}
+              <div className="h-4 w-[1px] bg-[#333]" />
+              <Documentation />
             </nav>
 
             <div className="ml-auto flex items-center gap-6">
@@ -101,7 +114,17 @@ export default function App() {
           >
              <div className="text-[11px] font-bold text-[#666670] tracking-[0.2em] mb-2 uppercase">Components</div>
              <div className="space-y-3">
-                {[
+                <TemplateLibrary onSelectTemplate={handleSelectTemplate} />
+                <Button 
+                   variant="ghost" 
+                   onClick={() => { setNodes([]); setEdges([]); setActiveNodeId(null); setTraces([]); }}
+                   className="w-full text-[#666670] hover:text-white border border-transparent hover:border-white/10 text-[9px] font-bold tracking-widest h-10"
+                >
+                  RESET ORCHESTRATOR
+                </Button>
+                
+                <div className="pt-2">
+                  {[
                   { name: 'LangChain', desc: 'Core Logic & LLM RAG', color: '#00f2ff' },
                   { name: 'LangGraph', desc: 'Stateful Orchestration', color: '#bd00ff' },
                   { name: 'LangFlow', desc: 'Visual Prototyping', color: '#00ffaa', active: true },
@@ -118,6 +141,7 @@ export default function App() {
                     <div className="text-[11px] text-[#666670] font-medium">{item.desc}</div>
                   </motion.div>
                 ))}
+                </div>
              </div>
 
              <LangSmithDashboard traces={traces} />
